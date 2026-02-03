@@ -15,11 +15,23 @@ class SmtpEmailService:
         msg["To"] = to
         msg.set_content(body)
 
-        with smtplib.SMTP(EMAIL_HOST, 587, timeout=30) as smtp:
+        try:
+            smtp = smtplib.SMTP(timeout=30)
+            
+            smtp.connect(EMAIL_HOST, 587)
+            
             smtp.ehlo()
             smtp.starttls()
             smtp.ehlo()
             smtp.login(EMAIL_USER, EMAIL_PASS)
             smtp.send_message(msg)
-
-        logger.info("✅ E-mail enviado com sucesso")
+            smtp.quit()
+            
+            logger.info("✅ E-mail enviado com sucesso")
+            
+        except smtplib.SMTPServerDisconnected:
+            logger.error("❌ O servidor SMTP desconectou inesperadamente. Verifique se o IP do GitHub não foi bloqueado.")
+            raise
+        except Exception as e:
+            logger.error(f"❌ Falha ao enviar e-mail: {str(e)}")
+            raise
