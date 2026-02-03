@@ -7,14 +7,19 @@ logger = get_logger(__name__)
 
 class SmtpEmailService:
     def send(self, to, subject, body):
-        logger.info(f"Enviando e-mail para {to} | Assunto: {subject}")
+        logger.info(f"📨 Enviando e-mail para {to} | Assunto: {subject}")
+
         msg = EmailMessage()
         msg["Subject"] = subject
         msg["From"] = EMAIL_USER
         msg["To"] = to
         msg.set_content(body)
 
-        with smtplib.SMTP_SSL(EMAIL_HOST, 465) as smtp:
+        with smtplib.SMTP(EMAIL_HOST, 587, timeout=30) as smtp:
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.ehlo()
             smtp.login(EMAIL_USER, EMAIL_PASS)
             smtp.send_message(msg)
-            logger.info("E-mail enviado com sucesso")
+
+        logger.info("✅ E-mail enviado com sucesso")
