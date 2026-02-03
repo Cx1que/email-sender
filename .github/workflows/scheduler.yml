@@ -1,14 +1,12 @@
 name: Email Scheduler
-
 on:
   schedule:
-    - cron: '1 2 * * *'
+    - cron: '50 2 * * *'
   workflow_dispatch:
 
 jobs:
   send-emails:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -23,15 +21,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install fastapi uvicorn sqlalchemy psycopg2-binary python-dotenv
 
-      - name: Resolve Supabase IPv4
-        run: |
-          IPV4=$(dig +short A db.qnaoiturntmayfjvxakv.supabase.co)
-          echo "DATABASE_URL=postgresql://postgres:${{ secrets.DATABASE_PASS }}@$IPV4:5432/postgres" >> $GITHUB_ENV
-
-      - name: Set email credentials
-        run: |
-          echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> $GITHUB_ENV
-          echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> $GITHUB_ENV
-
       - name: Run email scheduler
+        env:
+          # Use o Segredo que contém a URL COMPLETA do Pooler (porta 6543)
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
         run: python -m src.main
