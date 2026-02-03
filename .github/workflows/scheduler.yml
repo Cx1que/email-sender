@@ -1,7 +1,7 @@
 name: Email Scheduler
 on:
   schedule:
-    - cron: '45 2 * * *'
+    - cron: '50 2 * * *'
   workflow_dispatch:
 
 jobs:
