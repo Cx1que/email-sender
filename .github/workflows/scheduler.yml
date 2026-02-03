@@ -1,7 +1,7 @@
 name: Email Scheduler
 on:
   schedule:
-    - cron: '5 3 * * *'
+    - cron: '0 16,19 * * *'
   workflow_dispatch:
 
 jobs:
@@ -23,7 +23,6 @@ jobs:
 
       - name: Run email scheduler
         env:
-          # Use o Segredo que contém a URL COMPLETA do Pooler (porta 6543)
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           EMAIL_HOST: smtp.gmail.com
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
