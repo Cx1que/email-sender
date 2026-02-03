@@ -1,7 +1,7 @@
 import smtplib
 from email.message import EmailMessage
-from config.settings import EMAIL_HOST, EMAIL_USER, EMAIL_PASS
-from config.logger import get_logger
+from src.config.settings import EMAIL_HOST, EMAIL_USER, EMAIL_PASS
+from src.config.logger import get_logger
 
 logger = get_logger(__name__)
 

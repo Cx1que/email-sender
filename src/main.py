@@ -1,28 +1,25 @@
-from application.check_due_bills import CheckDueBills
-from infra.storage.json_bill_repository import JsonBillRepository
-from infra.email.smtp_email_service import SmtpEmailService
-from config.logger import get_logger
+from src.application.check_due_bills import CheckDueBills
+from src.infra.repositories.bill_repository import BillRepository
+from src.infra.email.smtp_email_service import SmtpEmailService
+from src.infra.database.connection import SessionLocal
+from src.config.logger import get_logger
 
 logger = get_logger(__name__)
 
 def main():
-    logger.info("Iniciando verificação de contas")
-
+    db = SessionLocal()
     try:
-        bill_repository = JsonBillRepository("data/bills.json")
+        logger.info("Iniciando scheduler de contas")
+
+        repo = BillRepository(db)
         email_service = SmtpEmailService()
+        checker = CheckDueBills(repo, email_service)
 
-        use_case = CheckDueBills(
-            bill_repository=bill_repository,
-            email_service=email_service
-        )
-        use_case.execute()
-
-        logger.info("Finalizando execução com sucesso")
-        
-    except Exception:
-        logger.exception("Erro fatal durante execução")
-        raise
+        checker.execute()
+    finally:
+        db.close_all()
+    
+    logger.info("Finalizando scheduler")
 
 if __name__ == "__main__":
     main()
