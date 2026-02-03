@@ -1,31 +1,37 @@
-name: Disparar Emails de Contas
+name: Email Scheduler
 
-runs-on: self-hosted
-
-schedule:
-  - cron: '55 1 * * *'
-
-env:
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  EMAIL_USER: ${{ secrets.EMAIL_USER }}
-  EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+on:
+  schedule:
+    - cron: '1 2 * * *'
+  workflow_dispatch:
 
 jobs:
   send-emails:
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout do código
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Configurar Python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
-      - name: Instalar dependências
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install fastapi uvicorn sqlalchemy psycopg2-binary python-dotenv
 
-      - name: Rodar script de envio de emails
+      - name: Resolve Supabase IPv4
         run: |
-          python -m src.main
+          IPV4=$(dig +short A db.qnaoiturntmayfjvxakv.supabase.co)
+          echo "DATABASE_URL=postgresql://postgres:${{ secrets.DATABASE_PASS }}@$IPV4:5432/postgres" >> $GITHUB_ENV
+
+      - name: Set email credentials
+        run: |
+          echo "EMAIL_USER=${{ secrets.EMAIL_USER }}" >> $GITHUB_ENV
+          echo "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" >> $GITHUB_ENV
+
+      - name: Run email scheduler
+        run: python -m src.main
