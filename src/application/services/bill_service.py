@@ -2,6 +2,7 @@ from src.infra.repositories.bill_repository import BillRepository
 from src.domain.models.bill import Bill
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
+from src.api.schemas.bill_schema import BillUpdate
 
 class BillService:
     def __init__(self, db: Session):
@@ -26,16 +27,23 @@ class BillService:
     def listar_contas_ativas(self):
         return self.repo.listar_contas_ativas()
     
-    def atualizar(self, data, bill_id: int):
-        bill = self.db.query(Bill).get(bill_id)
+    def atualizar(self, bill_id: int, data: BillUpdate):
+        bill = self.repo.buscar_por_id(bill_id)
 
         if not bill:
-            raise ValueError("Conta não encontrada")
+            raise HTTPException(
+                status_code=404,
+                detail="Conta não encontrada"
+            )
         
         if not bill.ativa:
-            raise ValueError("Conta desativada não pode ser atualizada")
-
+            raise HTTPException(
+                status_code=400,
+                detail="Conta desativada não pode ser atualizada"
+            )
+        
         bill.nome = data.nome
+        bill.data_vencimento = data.data_vencimento
         bill.descricao = data.descricao
         bill.email_notificacao = data.email_notificacao
 

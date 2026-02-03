@@ -18,9 +18,7 @@ class BillRepository:
     def listar_contas_ativas(self):
         return self.db.query(Bill).filter(Bill.ativa == True).all()
     
-    def atualizar(self, bill_id: int):
-        bill = self.db.query(Bill).get(bill_id)
-
+    def atualizar(self, bill: Bill):
         if not bill:
             return None
         
@@ -36,3 +34,6 @@ class BillRepository:
         bill.ativa = False
         self.db.commit()
         return bill
+    
+    def buscar_por_id(self, bill_id: int):
+        return self.db.get(Bill, bill_id)
