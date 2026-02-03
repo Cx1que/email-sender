@@ -25,6 +25,7 @@ jobs:
         env:
           # Use o Segredo que contém a URL COMPLETA do Pooler (porta 6543)
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          EMAIL_HOST: smtp.gmail.com
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
         run: python -m src.main
