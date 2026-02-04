@@ -1,31 +1,27 @@
 from pydantic import BaseModel
 from datetime import date
 from typing import Optional
+from src.domain.enums.status import Status
 
-class BillCreate(BaseModel):
+class BillBase(BaseModel):
     nome: str
     descricao: Optional[str] = None
+    valor: float
     tipo: str
     data_vencimento: date
     total_parcelas: Optional[int] = None
     parcela_atual: Optional[int] = None
     email_notificacao: str
 
-class BillUpdate(BaseModel):
-    nome: str
-    descricao: Optional[str] = None
-    tipo: str
-    data_vencimento: date
-    total_parcelas: Optional[int] = None
-    parcela_atual: Optional[int] = None
-    email_notificacao: str
+class BillCreate(BillBase):
+    pass
 
-class BillResponse(BaseModel):
+class BillUpdate(BillBase):
+    status: Optional[Status] = None
+
+class BillResponse(BillBase):
     id: int
-    nome: str
-    tipo: str
-    descricao: Optional[str] = None
-    data_vencimento: date
-    total_parcelas: Optional[int] = None
-    parcela_atual: Optional[int] = None
-    email_notificacao: str
+    status: Status
+
+    class Config:
+        from_attributes = True

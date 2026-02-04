@@ -1,5 +1,6 @@
 from src.infra.repositories.bill_repository import BillRepository
 from src.domain.models.bill import Bill
+from src.domain.enums.status import Status
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from src.api.schemas.bill_schema import BillUpdate
@@ -12,6 +13,8 @@ class BillService:
         conta = Bill(
             nome=data.nome,
             descricao=data.descricao,
+            valor=data.valor,
+            status= Status.ABERTA,
             tipo=data.tipo,
             data_vencimento=data.data_vencimento,
             total_parcelas=data.total_parcelas,
@@ -46,6 +49,7 @@ class BillService:
         bill.data_vencimento = data.data_vencimento
         bill.descricao = data.descricao
         bill.email_notificacao = data.email_notificacao
+        bill.status = data.status
 
         return self.repo.atualizar(bill) 
     
